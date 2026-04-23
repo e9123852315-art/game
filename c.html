@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Химическая дуэль: Анилин | Свойства и реакции</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #2c3e2f 0%, #1a2a1c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Roboto', 'Poppins', sans-serif;
+            padding: 20px;
+        }
+
+        /* Карточка игры с «химическим» дизайном */
+        .game-card {
+            max-width: 850px;
+            width: 100%;
+            background: #fef9e6;
+            background-image: radial-gradient(circle at 10% 20%, rgba(210, 180, 140, 0.1) 2%, transparent 2.5%);
+            background-size: 28px 28px;
+            border-radius: 48px 32px 48px 32px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255,255,200,0.8);
+            overflow: hidden;
+            transition: 0.2s;
+        }
+
+        /* Шапка с анилиновой тематикой */
+        .header {
+            background: #4a2e2a;
+            background: linear-gradient(135deg, #5e3a33, #3b231f);
+            padding: 20px 30px;
+            text-align: center;
+            border-bottom: 4px solid #c49a6c;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            letter-spacing: 1px;
+            color: #ffecb3;
+            text-shadow: 3px 3px 0 #2c1a16;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header h1 span {
+            font-size: 2rem;
+        }
+
+        .sub {
+            color: #f7d9b5;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* Статистика и прогресс */
+        .stats-panel {
+            display: flex;
+            justify-content: space-between;
+            background: #2e241f;
+            color: #f7e5c2;
+            padding: 12px 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .score-box, .q-counter {
+            background: #1f1612;
+            padding: 5px 18px;
+            border-radius: 40px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,200,0.2);
+        }
+
+        .progress-section {
+            padding: 12px 30px 0 30px;
+            background: #fef3e0;
+        }
+        .progress-bar {
+            height: 12px;
+            background: #d9c8b2;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #b86b3c;
+            background: linear-gradient(90deg, #b86b3c, #e69b5e);
+            border-radius: 20px;
+            transition: width 0.3s ease;
+        }
+
+        /* Основная область викторины */
+        .quiz-body {
+            padding: 30px 30px 20px;
+            min-height: 420px;
+        }
+
+        .question {
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: #2b2b1f;
+            margin-bottom: 30px;
+            line-height: 1.35;
+            border-left: 7px solid #c27e4a;
+            padding-left: 22px;
+            background: rgba(230, 210, 170, 0.3);
+            border-radius: 0 20px 20px 0;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            background: #fff6ea;
+            border: 2px solid #e0cfb0;
+            border-radius: 60px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #2c2b20;
+        }
+
+        .option:hover:not(.disabled-opt) {
+            background: #ffe6c7;
+            border-color: #c27e4a;
+            transform: scale(1.01);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+        }
+
+        .option-letter {
+            width: 38px;
+            height: 38px;
+            background: #c27e4a;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: inset 0 1px 1px rgba(0,0,0,0.2);
+        }
+
+        .option.selected {
+            background: #ffddb0;
+            border-color: #b85c1a;
+            box-shadow: 0 0 0 3px rgba(184, 92, 26, 0.3);
+        }
+
+        .option.correct-highlight {
+            background: #cfe9d9;
+            border-color: #2f6b47;
+        }
+
+        .option.wrong-highlight {
+            background: #ffdad2;
+            border-color: #bc4a2c;
+        }
+
+        .disabled-opt {
+            cursor: default;
+            opacity: 0.9;
+        }
+
+        /* Кнопка управления */
+        .action-btn {
+            background: #b85c1a;
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 14px;
+            border-radius: 50px;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.1s linear;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 0 #6e3810;
+            margin-top: 8px;
+        }
+
+        .action-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #6e3810;
+        }
+
+        .action-btn:disabled {
+            background: #aa926e;
+            box-shadow: 0 5px 0 #6b5a42;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 14px;
+            border-radius: 28px;
+            text-align: center;
+            font-weight: 600;
+            background: #ede3cf;
+            font-size: 0.95rem;
+        }
+
+        .feedback.correct-fb {
+            background: #cfe9d9;
+            color: #1a543b;
+            border-left: 6px solid #2f6b47;
+        }
+
+        .feedback.wrong-fb {
+            background: #ffe0d6;
+            color: #aa3a1c;
+            border-left: 6px solid #bc4a2c;
+        }
+
+        .restart-style {
+            background: #4a5b48;
+            box-shadow: 0 5px 0 #2a3828;
+        }
+
+        .footer {
+            background: #ddd0b8;
+            text-align: center;
+            padding: 12px;
+            font-size: 0.7rem;
+            color: #3c3629;
+        }
+
+        @media (max-width: 550px) {
+            .question {
+                font-size: 1.25rem;
+                padding-left: 14px;
+            }
+            .option {
+                padding: 10px 14px;
+                gap: 12px;
+            }
+            .stats-panel {
+                padding: 8px 20px;
+                font-size: 0.9rem;
+            }
+            .quiz-body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="game-card" id="gameCard">
+    <div class="header">
+        <h1>
+            <span>🧪</span> Химическая дуэль: АНИЛИН <span>⚗️</span>
+        </h1>
+        <div class="sub">C₆H₅NH₂ — ароматический амин: основные и химические свойства</div>
+    </div>
+    <div class="stats-panel">
+        <div class="score-box">🏆 Счёт: <span id="scoreDisplay">0</span></div>
+        <div class="q-counter">📌 Вопрос <span id="currentQNumber">1</span> / <span id="totalQuestionsCount">10</span></div>
+    </div>
+    <div class="progress-section">
+        <div class="progress-bar"><div class="progress-fill" id="progressFillQuiz"></div></div>
+    </div>
+
+    <div class="quiz-body" id="quizBody">
+        <div class="question" id="questionText">Загрузка...</div>
+        <div class="options-grid" id="optionsContainer"></div>
+        <button class="action-btn" id="submitActionBtn">✅ Ответить</button>
+        <div class="feedback" id="feedbackMessage"></div>
+    </div>
+    <div class="footer">
+        🔬 Анилин — важнейший полупродукт в производстве красителей, полимеров и лекарств.
+    </div>
+</div>
+
+<script>
+    // ---------- БАНК ВОПРОСОВ О ХИМИЧЕСКИХ СВОЙСТВАХ АНИЛИНА ----------
+    const QUESTIONS = [
+        {
+            text: "К какому классу органических соединений относится анилин?",
+            options: ["Фенолы", "Ароматические амины", "Алифатические амины", "Нитросоединения"],
+            correct: 1  // Ароматические амины
+        },
+        {
+            text: "Какая функциональная группа содержится в молекуле анилина?",
+            options: ["–OH", "–NO₂", "–NH₂", "–COOH"],
+            correct: 2  // аминогруппа
+        },
+        {
+            text: "Как анилин взаимодействует с соляной кислотой (HCl)?",
+            options: ["Образует соль — гидрохлорид анилина", "Реагирует с выделением водорода", "Окисляется до нитробензола", "Не взаимодействует"],
+            correct: 0
+        },
+        {
+            text: "При действии бромной воды на анилин происходит:",
+            options: ["Замещение в бензольном кольце (образование 2,4,6-триброманилина)", "Присоединение по двойной связи", "Замещение водорода аминогруппы", "Реакция не идёт"],
+            correct: 0
+        },
+        {
+            text: "Почему анилин проявляет более слабые основные свойства, чем алифатические амины (например, метиламин)?",
+            options: ["Из-за электроноакцепторного влияния бензольного кольца", "Из-за высокой растворимости в воде", "Из-за образования внутримолекулярных водородных связей", "Из-за меньшего размера молекулы"],
+            correct: 0
+        },
+        {
+            text: "Как анилин реагирует с азотистой кислотой (HNO₂) при низкой температуре (0–5 °C)?",
+            options: ["Образуется соль диазония (реакция диазотирования)", "Происходит нитрование в кольцо", "Образуется фенол", "Реакция не идёт"],
+            correct: 0
+        },
+        {
+            text: "Какое вещество образуется при окислении анилина (например, дихроматом калия в кислой среде)?",
+            options: ["Бензол", "Нитробензол", "Хинон и окрашенные продукты (анилиновый чёрный)", "Фенол"],
+            correct: 2
+        },
+        {
+            text: "Ацетилирование анилина (реакция с уксусным ангидридом) приводит к образованию:",
+            options: ["Ацетанилида (N-фенилацетамида)", "N-метиланилина", "Сульфаниловой кислоты", "Анилина ацетата"],
+            correct: 0
+        },
+        {
+            text: "Какой характер проявляет анилин по отношению к индикаторам?",
+            options: ["Кислый", "Основный (слабый)", "Нейтральный", "Амфотерный"],
+            correct: 1
+        },
+        {
+            text: "При нагревании анилина с концентрированной серной кислотой (при 180–200 °C) преимущественно происходит:",
+            options: ["Сульфирование в пара-положение с образованием сульфаниловой кислоты", "Деструкция бензольного кольца", "Восстановление до циклогексиламина", "Полимеризация"],
+            correct: 0
+        }
+    ];
+
+    // Глобальные переменные
+    let currentQuestionIndex = 0;      // 0-based
+    let score = 0;
+    let isAnswered = false;            // заблокирован ли выбор после ответа
+    let selectedOptionIdx = null;      // индекс выбранного варианта
+    const totalQ = QUESTIONS.length;
+
+    // DOM элементы
+    const questionEl = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const submitBtn = document.getElementById("submitActionBtn");
+    const feedbackDiv = document.getElementById("feedbackMessage");
+    const scoreSpan = document.getElementById("scoreDisplay");
+    const currentQSpan = document.getElementById("currentQNumber");
+    const totalQSpan = document.getElementById("totalQuestionsCount");
+    const progressFill = document.getElementById("progressFillQuiz");
+
+    // Инициализация игры / перезапуск
+    function initGame() {
+        currentQuestionIndex = 0;
+        score = 0;
+        isAnswered = false;
+        selectedOptionIdx = null;
+        updateScoreUI();
+        totalQSpan.innerText = totalQ;
+        loadQuestion();
+        updateProgress();
+        submitBtn.innerText = "✅ Ответить";
+        submitBtn.disabled = false;
+        feedbackDiv.innerHTML = "";
+        feedbackDiv.className = "feedback";
+    }
+
+    // Загрузить текущий вопрос в интерфейс
+    function loadQuestion() {
+        if (currentQuestionIndex >= totalQ) {
+            finishGame();
+            return;
+        }
+        const q = QUESTIONS[currentQuestionIndex];
+        questionEl.innerText = q.text;
+        currentQSpan.innerText = currentQuestionIndex + 1;
+
+        // Генерируем варианты
+        optionsContainer.innerHTML = "";
+        selectedOptionIdx = null;
+        q.options.forEach((opt, idx) => {
+            const letter = String.fromCharCode(65 + idx); // A, B, C, D
+            const optionDiv = document.createElement("div");
+            optionDiv.className = "option";
+            optionDiv.innerHTML = `
+                <div class="option-letter">${letter}</div>
+                <span>${opt}</span>
+            `;
+            optionDiv.dataset.index = idx;
+            optionDiv.addEventListener("click", () => onSelectOption(idx));
+            optionsContainer.appendChild(optionDiv);
+        });
+
+        // Убираем подсветки и классы блокировки
+        removeAllHighlights();
+        // Сброс сообщения, если игра не закончена
+        if (currentQuestionIndex < totalQ) {
+            feedbackDiv.innerHTML = "";
+            feedbackDiv.className = "feedback";
+            isAnswered = false;
+            submitBtn.innerText = "✅ Ответить";
+            submitBtn.disabled = false;
+        }
+    }
+
+    function onSelectOption(idx) {
+        if (isAnswered) {
+            feedbackDiv.innerHTML = "⏳ Вы уже ответили на этот вопрос. Нажмите «Следующий вопрос»!";
+            feedbackDiv.className = "feedback wrong-fb";
+            return;
+        }
+        // Удаляем выделение у всех
+        const allOpts = document.querySelectorAll(".option");
+        allOpts.forEach(opt => opt.classList.remove("selected"));
+        // Выделяем выбранный
+        if (allOpts[idx]) allOpts[idx].classList.add("selected");
+        selectedOptionIdx = idx;
+    }
+
+    // Обработка ответа пользователя
+    function submitAnswer() {
+        if (isAnswered) {
+            feedbackDiv.innerHTML = "🔁 Ответ уже дан! Переходите к следующему вопросу.";
+            feedbackDiv.className = "feedback wrong-fb";
+            return;
+        }
+        if (selectedOptionIdx === null) {
+            feedbackDiv.innerHTML = "⚠️ Сначала выберите один из вариантов ответа!";
+            feedbackDiv.className = "feedback wrong-fb";
+            return;
+        }
+
+        const currentQ = QUESTIONS[currentQuestionIndex];
+        const isCorrect = (selectedOptionIdx === currentQ.correct);
+        
+        // Подсветка правильных и неправильных вариантов
+        const allOptionsDivs = document.querySelectorAll(".option");
+        allOptionsDivs.forEach((btn, idx) => {
+            btn.classList.remove("selected");
+            if (idx === currentQ.correct) {
+                btn.classList.add("correct-highlight");
+            }
+            if (idx === selectedOptionIdx && idx !== currentQ.correct) {
+                btn.classList.add("wrong-highlight");
+            }
+            if (idx === selectedOptionIdx && idx === currentQ.correct) {
+                btn.classList.add("correct-highlight");
+            }
+        });
+
+        // Обновление счёта и сообщение
+        if (isCorrect) {
+            score++;
+            updateScoreUI();
+            feedbackDiv.innerHTML = "🎉 Верно! +1 очко. Отличное знание химии анилина!";
+            feedbackDiv.className = "feedback correct-fb";
+        } else {
+            const correctAns = currentQ.options[currentQ.correct];
+            const correctLetter = String.fromCharCode(65 + currentQ.correct);
+            feedbackDiv.innerHTML = `❌ Неверно. Правильный ответ: ${correctLetter}) ${correctAns}. Изучите свойства анилина подробнее.`;
+            feedbackDiv.className = "feedback wrong-fb";
+        }
+
+        isAnswered = true;
+        
+        // Изменяем кнопку в зависимости от номера вопроса
+        if (currentQuestionIndex + 1 === totalQ) {
+            submitBtn.innerText = "🏁 Завершить дуэль";
+        } else {
+            submitBtn.innerText = "➡️ Следующий вопрос";
+        }
+    }
+
+    // Переход к следующему вопросу или завершение
+    function nextOrFinish() {
+        if (!isAnswered && currentQuestionIndex < totalQ) {
+            // Если не отвечали, а нажали "Следующий вопрос" (но кнопка может быть "Ответить")
+            if (submitBtn.innerText.includes("Ответить")) {
+                feedbackDiv.innerHTML = "Сначала ответьте на вопрос, нажав «Ответить»!";
+                feedbackDiv.className = "feedback wrong-fb";
+                return;
+            }
+        }
+
+        if (currentQuestionIndex + 1 === totalQ && isAnswered) {
+            // Это был последний вопрос, завершаем игру
+            finishGame();
+            return;
+        }
+        
+        if (isAnswered && currentQuestionIndex + 1 < totalQ) {
+            currentQuestionIndex++;
+            isAnswered = false;
+            selectedOptionIdx = null;
+            loadQuestion();
+            updateProgress();
+            submitBtn.innerText = "✅ Ответить";
+        } else if (currentQuestionIndex + 1 === totalQ && isAnswered) {
+            finishGame();
+        } else {
+            // если ещё не ответили, но нажата кнопка с другим текстом — ничего не делаем
+            if (!isAnswered) {
+                feedbackDiv.innerHTML = "Пожалуйста, ответьте на вопрос перед переходом.";
+                feedbackDiv.className = "feedback wrong-fb";
+            }
+        }
+        updateProgress();
+    }
+
+    // Завершение игры: итоги и кнопка рестарта
+    function finishGame() {
+        const percent = Math.round((score / totalQ) * 100);
+        let resultMessage = "";
+        if (score === totalQ) {
+            resultMessage = "🏆 Блестяще! Вы эксперт по анилину! 🏆";
+        } else if (score >= totalQ * 0.7) {
+            resultMessage = "👍 Очень хорошо! Повторите реакции диазотирования и ацетилирования.";
+        } else if (score >= totalQ * 0.4) {
+            resultMessage = "📘 Неплохо, но стоит закрепить материал: основность, галогенирование, окисление анилина.";
+        } else {
+            resultMessage = "🧪 Попробуйте ещё раз! Изучите химические свойства ароматических аминов.";
+        }
+
+        // Очищаем контент викторины, показываем финал
+        optionsContainer.innerHTML = "";
+        questionEl.innerHTML = `🧪 ДУЭЛЬ ЗАВЕРШЕНА 🧪`;
+        feedbackDiv.innerHTML = `${resultMessage}<br><strong>Ваш результат: ${score} из ${totalQ} (${percent}%)</strong><br>Нажмите «Играть снова», чтобы повторить.`;
+        feedbackDiv.className = "feedback correct-fb";
+        
+        submitBtn.innerText = "🔄 Играть снова";
+        submitBtn.disabled = false;
+        isAnswered = true;  // блокируем лишние клики
+        // Удаляем старые обработчики, назначаем новый для рестарта
+        submitBtn.onclick = () => {
+            initGame();
+            attachMainHandlers();
+        };
+        progressFill.style.width = "100%";
+    }
+
+    function updateScoreUI() {
+        scoreSpan.innerText = score;
+    }
+
+    function updateProgress() {
+        let percent = (currentQuestionIndex / totalQ) * 100;
+        if (currentQuestionIndex === totalQ) percent = 100;
+        if (isAnswered && currentQuestionIndex + 1 === totalQ) percent = ((currentQuestionIndex + 1) / totalQ) * 100;
+        progressFill.style.width = `${Math.min(100, percent)}%`;
+    }
+
+    function removeAllHighlights() {
+        const allOpts = document.querySelectorAll(".option");
+        allOpts.forEach(opt => {
+            opt.classList.remove("correct-highlight", "wrong-highlight", "selected");
+        });
+    }
+
+    // Основной обработчик кнопки (динамический)
+    function attachMainHandlers() {
+        const btn = document.getElementById("submitActionBtn");
+        // Убираем старые слушатели через клонирование? проще назначить новый обработчик
+        // но чтобы избежать дублей, удалим старый обработчик, если есть
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        // обновим ссылку
+        const freshBtn = document.getElementById("submitActionBtn");
+        freshBtn.onclick = () => {
+            // если игра завершена и кнопка "Играть снова" — перезапуск
+            if (freshBtn.innerText === "🔄 Играть снова") {
+                initGame();
+                attachMainHandlers();
+                return;
+            }
+            // Если игра активна и ответ не заблокирован -> отвечаем
+            if (!isAnswered && currentQuestionIndex < totalQ) {
+                submitAnswer();
+            } 
+            else if (isAnswered && currentQuestionIndex < totalQ) {
+                nextOrFinish();
+            }
+            else if (currentQuestionIndex >= totalQ) {
+                finishGame();
+            }
+            updateProgress();
+        };
+        // сохраняем актуальную ссылку в глобальную переменную, если нужно, но достаточно
+        window.submitButton = freshBtn;
+    }
+
+    // Старт
+    initGame();
+    attachMainHandlers();
+</script>
+</body>
+</html>
